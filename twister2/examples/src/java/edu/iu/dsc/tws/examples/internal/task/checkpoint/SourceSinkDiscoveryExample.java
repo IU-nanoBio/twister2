@@ -126,10 +126,10 @@ public class SourceSinkDiscoveryExample implements IWorker {
     @Override
     public void execute() {
 
-      try{
+      try {
         Thread.sleep(1000);
         ctx.write("partition-edge", "Hello");
-      } catch (Exception e ){
+      } catch (Exception e ) {
 
       }
 
