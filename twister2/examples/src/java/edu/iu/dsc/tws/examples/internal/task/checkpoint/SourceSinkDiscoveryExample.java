@@ -89,7 +89,7 @@ public class SourceSinkDiscoveryExample implements IWorker {
 
     GraphBuilder builder = GraphBuilder.newBuilder();
     builder.addSource("source", g);
-    builder.setParallelism("source", 4);
+    builder.setParallelism("source", 8);
     builder.addSink("sink", r);
     builder.setParallelism("sink", 4);
     builder.connect("source", "sink", "partition-edge",
@@ -125,14 +125,15 @@ public class SourceSinkDiscoveryExample implements IWorker {
 
     @Override
     public void execute() {
-
-      try {
-        Thread.sleep(1000);
+      if (count % 1000000 == 0) {
+//        this.addState("count", count);
+      }
+      if (count % 1000000 == 0) {
         ctx.write("partition-edge", "Hello");
-      } catch (Exception e) {
-
+        LOG.log(Level.INFO, "count for source is " + count);
       }
 
+      count++;
     }
 
     @Override
@@ -163,13 +164,9 @@ public class SourceSinkDiscoveryExample implements IWorker {
 
     @Override
     public boolean execute(IMessage message) {
-      if (count % 10000 == 0) {
-        LOG.log(Level.INFO, "count in sink is " + count);
-        System.out.println(message.getContent() + " from Sink Task " + ctx.taskId());
-      }
-
+      System.out.println(message.getContent() + " from Sink Task " + ctx.taskId());
       count++;
-
+      LOG.log(Level.INFO, "count in sink is " + count);
       return true;
     }
 
@@ -217,7 +214,7 @@ public class SourceSinkDiscoveryExample implements IWorker {
     Twister2Job.BasicJobBuilder jobBuilder = Twister2Job.newBuilder();
     jobBuilder.setName("source-sink-discovery-example");
     jobBuilder.setWorkerClass(SourceSinkDiscoveryExample.class.getName());
-    jobBuilder.setRequestResource(new WorkerComputeResource(1, 512), 4);
+    jobBuilder.setRequestResource(new WorkerComputeResource(1, 512), 8);
     jobBuilder.setConfig(jobConfig);
 
     // now submit the job
