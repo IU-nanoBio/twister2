@@ -78,7 +78,7 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
               initialTime = System.currentTimeMillis();
             }
             String timeGap = Double.toString(
-                10000000.0 / (System.currentTimeMillis() - initialTime)
+                2000000.0 / (System.currentTimeMillis() - initialTime)
             );
 //            log.info("Producing to kafka, Message : {} , Topic : {}, Partition : {}",
 //                data, data, topicPartition.partition());
