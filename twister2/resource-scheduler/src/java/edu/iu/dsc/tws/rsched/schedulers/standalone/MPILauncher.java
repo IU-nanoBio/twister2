@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
-import edu.iu.dsc.tws.checkpointmanager.CheckpointManager;
+//import edu.iu.dsc.tws.checkpointmanager.CheckpointManager;
 import edu.iu.dsc.tws.common.config.Config;
 import edu.iu.dsc.tws.common.config.Context;
 import edu.iu.dsc.tws.common.resource.RequestedResources;
