@@ -40,8 +40,8 @@ public abstract class SourceCheckpointableTask extends BaseStreamSource implemen
 
   private int currentBarrierID = 1;
   private int intermediateMessageCount;
-  private long currentCheckpointInterval = 10000;
-  private long globalCheckpointInterval = 10000;
+  private long currentCheckpointInterval = 5000;
+  private long globalCheckpointInterval = 5000;
   private long overallMessageCount = 0;
   private final long startedTime = System.currentTimeMillis();
   private long lastCheckpointTime;

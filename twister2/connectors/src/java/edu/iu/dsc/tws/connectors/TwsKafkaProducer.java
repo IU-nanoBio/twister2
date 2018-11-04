@@ -42,6 +42,7 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
   private KafkaTopicDescription topicDescription;
   private List<TopicPartition> topicPartitions;
   private Properties simpleKafkaConfig;
+  private long initialTime = 0;
 
   @Override
   public void addCheckpointableStates() {
@@ -50,7 +51,7 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
 
   @Override
   public boolean execute(IMessage message) {
-    log.info("Recieved message {}", message.getContent());
+//    log.info("Recieved message {}", message.getContent());
 //    if (this.singleTopic == null) {
 //      for (String topic : this.listOfTopics) {
 //        log.info("Producing to kafka message : {} , Topic : {}", message.getContent(), topic);
@@ -73,12 +74,18 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
         String[] tokens = data.split(":");
         if (tokens[0].equals("log")) {
           if (tokens[1].equals("Login")) {
+            if (initialTime == 0) {
+              initialTime = System.currentTimeMillis();
+            }
+            String timeGap = Double.toString(
+                10000000.0 / (System.currentTimeMillis() - initialTime)
+            );
 //            log.info("Producing to kafka, Message : {} , Topic : {}, Partition : {}",
 //                data, data, topicPartition.partition());
             producer.send(new ProducerRecord<String, String>(topicPartition.topic(),
                 topicPartition.partition(),
-                data,
-                data));
+                timeGap,
+                timeGap));
           }
         } else {
           log.info("Producing to kafka, Message : {} , Topic : {}, Partition : {}",
