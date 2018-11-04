@@ -125,15 +125,14 @@ public class SourceSinkDiscoveryExample implements IWorker {
 
     @Override
     public void execute() {
-      if (count % 1000000 == 0) {
-//        this.addState("count", count);
-      }
-      if (count % 1000000 == 0) {
+
+      try{
+        Thread.sleep(1000);
         ctx.write("partition-edge", "Hello");
-        LOG.log(Level.INFO, "count for source is " + count);
+      } catch (Exception e ){
+
       }
 
-      count++;
     }
 
     @Override
@@ -164,9 +163,13 @@ public class SourceSinkDiscoveryExample implements IWorker {
 
     @Override
     public boolean execute(IMessage message) {
-      System.out.println(message.getContent() + " from Sink Task " + ctx.taskId());
+      if (count % 10000 == 0) {
+        LOG.log(Level.INFO, "count in sink is " + count);
+        System.out.println(message.getContent() + " from Sink Task " + ctx.taskId());
+      }
+
       count++;
-      LOG.log(Level.INFO, "count in sink is " + count);
+
       return true;
     }
 
