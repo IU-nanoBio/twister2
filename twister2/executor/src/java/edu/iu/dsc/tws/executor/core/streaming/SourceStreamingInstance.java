@@ -141,9 +141,9 @@ public class SourceStreamingInstance implements INodeInstance {
 
     streamingTask.prepare(config, taskContext);
 
-    if (streamingTask instanceof SourceCheckpointableTask) {
-      ((SourceCheckpointableTask) streamingTask).connect(config, taskContext);
-    }
+//    if (streamingTask instanceof SourceCheckpointableTask) {
+//      ((SourceCheckpointableTask) streamingTask).connect(config, taskContext);
+//    }
 
   }
 
@@ -151,9 +151,9 @@ public class SourceStreamingInstance implements INodeInstance {
    * Execution Method calls the SourceTasks run method to get context
    **/
   public boolean execute() {
-    if (streamingTask instanceof SourceCheckpointableTask) {
-      ((SourceCheckpointableTask) streamingTask).checkForTimeInterval();
-    }
+//    if (streamingTask instanceof SourceCheckpointableTask) {
+//      ((SourceCheckpointableTask) streamingTask).checkForTimeInterval();
+//    }
     if (outStreamingQueue.size() < lowWaterMark) {
       // lets execute the task
       streamingTask.execute();
