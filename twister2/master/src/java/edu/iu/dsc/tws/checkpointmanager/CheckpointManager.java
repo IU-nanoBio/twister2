@@ -47,7 +47,7 @@ public class CheckpointManager extends Thread {
 
     this.cfg = config;
     looper = new Progress();
-    rrServer = new RRServer(cfg, "localhost", 6789, looper,
+    rrServer = new RRServer(cfg, "t-login1", 6789, looper,
         -2, new ServerConnectHandler());
 
     TaskBarrierMonitor taskBarrierMonitor = new TaskBarrierMonitor(cfg, rrServer);

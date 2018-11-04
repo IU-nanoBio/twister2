@@ -89,9 +89,9 @@ public class SourceSinkDiscoveryExample implements IWorker {
 
     GraphBuilder builder = GraphBuilder.newBuilder();
     builder.addSource("source", g);
-    builder.setParallelism("source", 4);
+    builder.setParallelism("source", 8);
     builder.addSink("sink", r);
-    builder.setParallelism("sink", 4);
+    builder.setParallelism("sink", 8);
     builder.connect("source", "sink", "partition-edge",
         Operations.PARTITION);
     builder.operationMode(OperationMode.STREAMING);
@@ -214,7 +214,7 @@ public class SourceSinkDiscoveryExample implements IWorker {
     Twister2Job.BasicJobBuilder jobBuilder = Twister2Job.newBuilder();
     jobBuilder.setName("source-sink-discovery-example");
     jobBuilder.setWorkerClass(SourceSinkDiscoveryExample.class.getName());
-    jobBuilder.setRequestResource(new WorkerComputeResource(1, 512), 4);
+    jobBuilder.setRequestResource(new WorkerComputeResource(1, 512), 8);
     jobBuilder.setConfig(jobConfig);
 
     // now submit the job

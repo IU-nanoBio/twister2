@@ -60,7 +60,7 @@ public abstract class SourceCheckpointableTask extends BaseStreamSource implemen
     this.lastCheckpointTime = startedTime;
     taskLooper = new Progress();
 
-    taskClient = new RRClient("localhost", 6789, cfg, taskLooper,
+    taskClient = new RRClient("t-login1", 6789, cfg, taskLooper,
         context.taskId(), new TaskClientConnectHandler());
 
     taskClient.registerResponseHandler(Checkpoint.TaskDiscovery.newBuilder(),
