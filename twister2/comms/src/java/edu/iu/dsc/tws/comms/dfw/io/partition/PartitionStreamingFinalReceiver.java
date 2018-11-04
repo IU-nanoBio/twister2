@@ -74,7 +74,7 @@ public class PartitionStreamingFinalReceiver implements MessageReceiver {
             messages.get(messageObject.getTarget()).offer(messageObject.getMessage());
           }
           barrierMap.clear();
-          bufferMessage = new ArrayBlockingQueue<>(2000);
+          bufferMessage = new ArrayBlockingQueue<>(20000);
         }
       }
       return true;
