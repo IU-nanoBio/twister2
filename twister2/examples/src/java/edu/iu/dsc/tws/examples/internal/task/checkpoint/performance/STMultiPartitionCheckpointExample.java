@@ -67,6 +67,27 @@ public class STMultiPartitionCheckpointExample implements IWorker {
   private static final Logger LOG =
       Logger.getLogger(STMultiPartitionCheckpointExample.class.getName());
 
+  public static void main(String[] args) {
+    // first load the configurations from command line and config files
+    Config config = ResourceAllocator.loadConfig(new HashMap<>());
+
+    // build JobConfig
+    HashMap<String, Object> configurations = new HashMap<>();
+    configurations.put(SchedulerContext.THREADS_PER_WORKER, 8);
+
+    // build JobConfig
+    JobConfig jobConfig = new JobConfig();
+    jobConfig.putAll(configurations);
+    Twister2Job.BasicJobBuilder jobBuilder = Twister2Job.newBuilder();
+    jobBuilder.setName("st-multi-partition-checkpoint");
+    jobBuilder.setWorkerClass(STMultiPartitionCheckpointExample.class.getName());
+    jobBuilder.setRequestResource(new WorkerComputeResource(1, 512), 4);
+    jobBuilder.setConfig(jobConfig);
+
+    // now submit the job
+    Twister2Submitter.submitJob(jobBuilder.build(), config);
+  }
+
   @Override
   public void execute(Config config, int workerID, AllocatedResources resources,
                       IWorkerController workerController,
@@ -141,6 +162,16 @@ public class STMultiPartitionCheckpointExample implements IWorker {
     executor.execute();
   }
 
+  public WorkerPlan createWorkerPlan(AllocatedResources resourcePlan) {
+    List<Worker> workers = new ArrayList<>();
+    for (WorkerComputeResource resource : resourcePlan.getWorkerComputeResources()) {
+      Worker w = new Worker(resource.getId());
+      workers.add(w);
+    }
+
+    return new WorkerPlan(workers);
+  }
+
   private static class GeneratorTask extends SourceCheckpointableTask {
     private static final long serialVersionUID = -254264903510284748L;
     private TaskContext ctx;
@@ -176,7 +207,6 @@ public class STMultiPartitionCheckpointExample implements IWorker {
     }
   }
 
-
   public static class MiddleTask extends ComputeCheckpointableTask {
 
     private static final long serialVersionUID = -254264903231284798L;
@@ -194,20 +224,11 @@ public class STMultiPartitionCheckpointExample implements IWorker {
       @SuppressWarnings("unchecked")
       String data = ((Iterator<String>) content.getContent()).next();
 
-      String pattern = "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+)\\s?(\\S+)"
-          +  "?\\s?(\\S+)?\" (\\d{3}|-) (\\d+|-)\\s?\"?([^\"]*)\"?\\s?\"?([^\"]*)?\"?$";
+      String[] array = data.split(" ");
+      String[] array1 = array[0].split(":");
 
-      Pattern r = Pattern.compile(pattern);
-
-      Matcher m = r.matcher(data);
-
-      if (m.find()) {
-        if (m.group().equals("LOG)")) {
-          this.context.write("partition-edge-2", data);
-        }
-
-      } else {
-        System.out.println("NO MATCH");
+      if (array1[1].equals("LOGIN)")) {
+        this.context.write("partition-edge-2", data);
       }
 
       return true;
@@ -258,37 +279,6 @@ public class STMultiPartitionCheckpointExample implements IWorker {
     }
 
 
-  }
-
-  public WorkerPlan createWorkerPlan(AllocatedResources resourcePlan) {
-    List<Worker> workers = new ArrayList<>();
-    for (WorkerComputeResource resource : resourcePlan.getWorkerComputeResources()) {
-      Worker w = new Worker(resource.getId());
-      workers.add(w);
-    }
-
-    return new WorkerPlan(workers);
-  }
-
-  public static void main(String[] args) {
-    // first load the configurations from command line and config files
-    Config config = ResourceAllocator.loadConfig(new HashMap<>());
-
-    // build JobConfig
-    HashMap<String, Object> configurations = new HashMap<>();
-    configurations.put(SchedulerContext.THREADS_PER_WORKER, 8);
-
-    // build JobConfig
-    JobConfig jobConfig = new JobConfig();
-    jobConfig.putAll(configurations);
-    Twister2Job.BasicJobBuilder jobBuilder = Twister2Job.newBuilder();
-    jobBuilder.setName("st-multi-partition-checkpoint");
-    jobBuilder.setWorkerClass(STMultiPartitionCheckpointExample.class.getName());
-    jobBuilder.setRequestResource(new WorkerComputeResource(1, 512), 4);
-    jobBuilder.setConfig(jobConfig);
-
-    // now submit the job
-    Twister2Submitter.submitJob(jobBuilder.build(), config);
   }
 }
 
