@@ -179,12 +179,11 @@ public class KafkaConsumerThread<T> {
   public void emitRecord(String value, KafkaTopicPartitionState tps, Long offset) {
 //    LOG.info("emitting record {} from the partition {}", value, offset);
     String[] tokens = value.split(":");
-    if (tokens[0].equals("log") && tokens[1].equals("Login")) {
-      tps.setPositionOffset(offset);
+    tps.setPositionOffset(offset);
 //      LOG.info(value);
-      offsetsToCommit.put(tps.getTopicPartition(), new OffsetAndMetadata(offset));
-      taskContext.write(this.edge, value);
-    }
+    offsetsToCommit.put(tps.getTopicPartition(), new OffsetAndMetadata(offset));
+    taskContext.write(this.edge, value);
+
   }
 
   public Map<TopicPartition, OffsetAndMetadata> getOffsetsToSubscribe() {

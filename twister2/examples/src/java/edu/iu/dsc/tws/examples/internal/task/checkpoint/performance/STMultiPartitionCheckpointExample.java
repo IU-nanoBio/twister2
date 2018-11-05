@@ -14,9 +14,12 @@ package edu.iu.dsc.tws.examples.internal.task.checkpoint.performance;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.iu.dsc.tws.api.JobConfig;
 import edu.iu.dsc.tws.api.Twister2Submitter;
@@ -33,6 +36,8 @@ import edu.iu.dsc.tws.common.worker.IVolatileVolume;
 import edu.iu.dsc.tws.common.worker.IWorker;
 import edu.iu.dsc.tws.comms.api.TWSChannel;
 import edu.iu.dsc.tws.comms.op.Communicator;
+import edu.iu.dsc.tws.connectors.TwsKafkaConsumer;
+import edu.iu.dsc.tws.connectors.TwsKafkaProducer;
 import edu.iu.dsc.tws.data.fs.Path;
 import edu.iu.dsc.tws.data.fs.local.LocalFileSystem;
 import edu.iu.dsc.tws.executor.api.ExecutionPlan;
@@ -84,11 +89,21 @@ public class STMultiPartitionCheckpointExample implements IWorker {
           runtime.getJobName(), 0);
     }
 
-    GeneratorTask g = new GeneratorTask();
+    List<String> topics = new ArrayList<>();
+    topics.add("sample_topic1");
+    List<String> servers = new ArrayList<>();
+    servers.add("t-login1:9092");
+    TwsKafkaConsumer<String> g = new TwsKafkaConsumer<String>(
+        topics,
+        servers,
+        "test",
+        "partition-edge");
+    TwsKafkaProducer<String> r = new TwsKafkaProducer<String>(
+        "outTopic",
+        servers
+    );
 
     MiddleTask m = new MiddleTask();
-
-    ReceivingTask r = new ReceivingTask();
 
     GraphBuilder builder = GraphBuilder.newBuilder();
 
@@ -175,12 +190,25 @@ public class STMultiPartitionCheckpointExample implements IWorker {
 
     @Override
     public boolean execute(IMessage content) {
-      count++;
 
-      LOG.info("Count in middle task " + context.taskId() + " is " + count);
+      @SuppressWarnings("unchecked")
+      String data = ((Iterator<String>) content.getContent()).next();
 
-      context.write("partition-edge-2", "Hello");
+      String pattern = "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+)\\s?(\\S+)" +
+          "?\\s?(\\S+)?\" (\\d{3}|-) (\\d+|-)\\s?\"?([^\"]*)\"?\\s?\"?([^\"]*)?\"?$";
 
+      Pattern r = Pattern.compile(pattern);
+
+      Matcher m = r.matcher(data);
+
+      if (m.find()) {
+        if (m.group().equals("LOG)")) {
+          this.context.write("partition-edge-2", data);
+        }
+
+      } else {
+        System.out.println("NO MATCH");
+      }
 
       return true;
     }

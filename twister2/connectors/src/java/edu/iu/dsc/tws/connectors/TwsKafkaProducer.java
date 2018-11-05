@@ -71,30 +71,30 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
       for (TopicPartition topicPartition : topicPartitions) {
         @SuppressWarnings("unchecked")
         String data = ((Iterator<String>) message.getContent()).next();
-        String[] tokens = data.split(":");
-        if (tokens[0].equals("log")) {
-          if (tokens[1].equals("Login")) {
-            if (initialTime == 0) {
-              initialTime = System.currentTimeMillis();
-            }
-            String timeGap = Double.toString(
-                2000000.0 / (System.currentTimeMillis() - initialTime)
-            );
-//            log.info("Producing to kafka, Message : {} , Topic : {}, Partition : {}",
-//                data, data, topicPartition.partition());
-            producer.send(new ProducerRecord<String, String>(topicPartition.topic(),
-                topicPartition.partition(),
-                timeGap,
-                timeGap));
-          }
-        } else {
+//        String[] tokens = data.split(":");
+//        if (tokens[0].equals("log")) {
+//          if (tokens[1].equals("Login")) {
+//            if (initialTime == 0) {
+//              initialTime = System.currentTimeMillis();
+//            }
+//            String timeGap = Double.toString(
+//                2000000.0 / (System.currentTimeMillis() - initialTime)
+//            );
+////            log.info("Producing to kafka, Message : {} , Topic : {}, Partition : {}",
+////                data, data, topicPartition.partition());
+//            producer.send(new ProducerRecord<String, String>(topicPartition.topic(),
+//                topicPartition.partition(),
+//                timeGap,
+//                timeGap));
+//          }
+//        } else {
           log.info("Producing to kafka, Message : {} , Topic : {}, Partition : {}",
               message.getContent(), topicPartition.topic(), topicPartition.partition());
           producer.send(new ProducerRecord<String, String>(topicPartition.topic(),
               topicPartition.partition(),
-              message.getContent().toString(),
-              message.getContent().toString()));
-        }
+              data,
+              data));
+//        }
       }
     }
     return true;
