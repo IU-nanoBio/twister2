@@ -191,7 +191,7 @@ public final class MPIWorker {
     try {
       String twister2Home = Context.twister2Home(config);
       // initialize the logger
-      initLogger(config, rank, twister2Home);
+//      initLogger(config, rank, twister2Home);
 
       // lets create the resource plan
       Map<Integer, String> processNames = createResourcePlan(config);
