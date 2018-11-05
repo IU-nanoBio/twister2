@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
-//import edu.iu.dsc.tws.checkpointmanager.CheckpointManager;
+import edu.iu.dsc.tws.checkpointmanager.CheckpointManager;
 import edu.iu.dsc.tws.common.config.Config;
 import edu.iu.dsc.tws.common.config.Context;
 import edu.iu.dsc.tws.common.resource.RequestedResources;
@@ -49,7 +49,7 @@ public class MPILauncher implements ILauncher {
     // get the job working directory
     this.jobWorkingDirectory = MPIContext.workingDirectory(mConfig);
 
-//    CheckpointManager cm = new CheckpointManager(config);
+    CheckpointManager cm = new CheckpointManager(config);
   }
 
   @Override

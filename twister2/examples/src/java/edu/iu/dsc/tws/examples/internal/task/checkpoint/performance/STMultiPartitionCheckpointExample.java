@@ -97,7 +97,7 @@ public class STMultiPartitionCheckpointExample implements IWorker {
         topics,
         servers,
         "test",
-        "partition-edge");
+        "partition-edge-1");
     TwsKafkaProducer<String> r = new TwsKafkaProducer<String>(
         "outTopic",
         servers
