@@ -222,10 +222,14 @@ public class STMultiPartitionCheckpointExample implements IWorker {
       @SuppressWarnings("unchecked")
       String data = ((Iterator<String>) content.getContent()).next();
 
-      String[] array = data.split(" ");
-      String[] array1 = array[0].split(":");
+      LOG.info(data);
 
-      if (array1[1].equals("LOGIN)")) {
+      String[] array = data.split(":");
+//      String[] array1 = array[0].split(":");
+
+      LOG.info(array[1]);
+
+      if (array[1].equals("LOGIN)")) {
         this.context.write("partition-edge-2", data);
       }
 
