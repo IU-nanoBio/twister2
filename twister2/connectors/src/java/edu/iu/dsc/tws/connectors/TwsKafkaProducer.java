@@ -44,6 +44,30 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
   private Properties simpleKafkaConfig;
   private long initialTime = 0;
 
+  public TwsKafkaProducer(
+      List<String> topics,
+      List<String> servers
+  ) {
+    this.kafkaConfigs = createKafkaConfig(servers);
+    this.listOfTopics = topics;
+    this.simpleKafkaConfig = KafkaConsumerConfig.getSimpleKafkaConsumer(servers);
+
+  }
+
+  public TwsKafkaProducer(
+      String singletopic,
+      List<String> servers
+  ) {
+    this.kafkaConfigs = createKafkaConfig(servers);
+    this.listOfTopics = new ArrayList<>();
+    listOfTopics.add(singletopic);
+    this.simpleKafkaConfig = KafkaConsumerConfig.getSimpleKafkaConsumer(servers);
+  }
+
+  public TwsKafkaProducer() {
+
+  }
+
   @Override
   public void addCheckpointableStates() {
     this.addState("trial", 2);
@@ -116,26 +140,6 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
 
   }
 
-  public TwsKafkaProducer(
-      List<String> topics,
-      List<String> servers
-  ) {
-    this.kafkaConfigs = createKafkaConfig(servers);
-    this.listOfTopics = topics;
-    this.simpleKafkaConfig = KafkaConsumerConfig.getSimpleKafkaConsumer(servers);
-
-  }
-
-  public TwsKafkaProducer(
-      String singletopic,
-      List<String> servers
-  ) {
-    this.kafkaConfigs = createKafkaConfig(servers);
-    this.listOfTopics = new ArrayList<>();
-    listOfTopics.add(singletopic);
-    this.simpleKafkaConfig = KafkaConsumerConfig.getSimpleKafkaConsumer(servers);
-  }
-
   private Properties createKafkaConfig(List<String> servers) {
     return KafkaProducerConfig.getConfig(servers);
   }
@@ -149,13 +153,8 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
     return kafkaConfigs;
   }
 
-
   public void setKafkaConfigs(Properties kafkaConfigs) {
     this.kafkaConfigs = kafkaConfigs;
-  }
-
-  public TwsKafkaProducer() {
-
   }
 
 }
