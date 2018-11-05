@@ -112,9 +112,9 @@ public class TwsKafkaProducer<T> extends SinkCheckpointableTask {
 //                timeGap));
 //          }
 //        } else {
-          log.info("Producing to kafka, Message : {} , Topic : {}, Partition : {}",
+        log.info("Producing to kafka, Message : {} , Topic : {}, Partition : {}",
               message.getContent(), topicPartition.topic(), topicPartition.partition());
-          producer.send(new ProducerRecord<String, String>(topicPartition.topic(),
+        producer.send(new ProducerRecord<String, String>(topicPartition.topic(),
               topicPartition.partition(),
               data,
               data));
