@@ -194,8 +194,8 @@ public class STMultiPartitionCheckpointExample implements IWorker {
       @SuppressWarnings("unchecked")
       String data = ((Iterator<String>) content.getContent()).next();
 
-      String pattern = "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+)\\s?(\\S+)" +
-          "?\\s?(\\S+)?\" (\\d{3}|-) (\\d+|-)\\s?\"?([^\"]*)\"?\\s?\"?([^\"]*)?\"?$";
+      String pattern = "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+)\\s?(\\S+)"
+          +  "?\\s?(\\S+)?\" (\\d{3}|-) (\\d+|-)\\s?\"?([^\"]*)\"?\\s?\"?([^\"]*)?\"?$";
 
       Pattern r = Pattern.compile(pattern);
 
