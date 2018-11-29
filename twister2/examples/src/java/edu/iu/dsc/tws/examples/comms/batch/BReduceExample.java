@@ -32,6 +32,7 @@ import edu.iu.dsc.tws.executor.core.OperationNames;
 
 public class BReduceExample extends BenchWorker {
   private static final Logger LOG = Logger.getLogger(BReduceExample.class.getName());
+  private long startTiming;
 
   private BReduce reduce;
 
@@ -39,6 +40,7 @@ public class BReduceExample extends BenchWorker {
 
   @Override
   protected void execute() {
+    startTiming = System.currentTimeMillis();
     TaskPlan taskPlan = Utils.createStageTaskPlan(config, workerId,
         jobParameters.getTaskStages(), workerList);
 
@@ -105,6 +107,7 @@ public class BReduceExample extends BenchWorker {
       experimentData.setOutput(object);
       LOG.info("Reduced value : " + Arrays.toString((int[]) object));
       reduceDone = true;
+      LOG.info("Total Timing :: " + (System.currentTimeMillis() - startTiming));
       try {
         verify();
       } catch (VerificationException e) {
