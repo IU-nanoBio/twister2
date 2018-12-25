@@ -94,11 +94,7 @@ public final class Utils {
   }
 
   private static int nextExecutorId(int current, int noOfContainers) {
-    if (current < noOfContainers - 1) {
-      return current + 1;
-    } else {
-      return 0;
-    }
+    return (current + 1) % noOfContainers;
   }
 
   public static String printMap(Map<Integer, Set<Integer>> map) {
