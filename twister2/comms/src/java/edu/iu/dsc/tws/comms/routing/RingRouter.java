@@ -62,7 +62,7 @@ public class RingRouter {
 
     this.destinationIdentifiers = new HashMap<>();
     // construct the map of receiving ids
-    this.receiveTasks = new HashMap<Integer, List<Integer>>();
+    this.receiveTasks = new HashMap<>();
 
     // now lets construct the downstream tasks
     sendExternalTasksPartial = new HashMap<>();
@@ -74,7 +74,7 @@ public class RingRouter {
     for (int t : thisExecutorTasksOfOperation) {
       List<Integer> recv = new ArrayList<>();
 
-      RingNode node = fixedRing.get(t);
+      Node node = fixedRing.get(t);
       if (node != null) {
         mainTask = node.getTaskId();
         LOG.fine(String.format("%d main task: %d", plan.getThisExecutor(), mainTask));
@@ -96,7 +96,7 @@ public class RingRouter {
 
 
         // now lets calculate the external send tasks of the main task
-        Node downStream = node.getDownStream();
+        Node downStream = node.getParent();
         if (downStream == null) {
           throw new IllegalStateException("Downstream node cannot be null, ring communication "
               + "should always have a downstream element");

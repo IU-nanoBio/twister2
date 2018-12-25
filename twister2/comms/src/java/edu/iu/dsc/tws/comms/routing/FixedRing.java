@@ -11,7 +11,11 @@
 //  limitations under the License.
 package edu.iu.dsc.tws.comms.routing;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,17 +31,37 @@ public class FixedRing {
   /**
    * A circular list which maps executor id's
    */
-  private Map<Integer, RingNode> ring;
+  private Map<Integer, Node> ring;
 
   public FixedRing(TaskPlan plan, Set<Integer> sources, Set<Integer> destinations) {
-//    for (Integer integer : plan.get) {
-//
-//    }
+    this.taskPlan = plan;
     ring = new HashMap<>();
+    List<Integer> tasks;
+    // create nodes for each executor and connect them
+    Iterator<Integer> iter = plan.getAllExecutors().iterator();
+    while (iter.hasNext()) {
+      int executor = iter.next();
+      tasks = new ArrayList<>(plan.getChannelsOfExecutor(executor));
+      Collections.sort(tasks);
+      int group = plan.getGroupOfExecutor(executor);
+      int mainTaskId = -1;
+      // set the smallest task in the group as the main task
+      if (tasks != null && tasks.size() > 0) {
+        mainTaskId = tasks.get(0);
+        tasks.remove(mainTaskId);
+      }
 
+      if (mainTaskId == -1) {
+        throw new IllegalStateException("The main task ID must be set");
+      }
+      Node node = new Node(mainTaskId, group);
+      node.addDirectChildren(tasks);
+    }
+
+    //Now to connect the ring
   }
 
-  public RingNode get(int t) {
+  public Node get(int t) {
     return null;
   }
 }

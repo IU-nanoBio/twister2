@@ -11,13 +11,18 @@
 //  limitations under the License.
 package edu.iu.dsc.tws.comms.routing;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class RingNode {
-  public int getTaskId() {
-    return -1;
-  }
+
+  /**
+   * The main task for this node
+   */
+  private int mainTaskId = -1;
+
+  private List<Integer> directChildren = new ArrayList<>();
 
   public int[] getRemoteChildrenIds() {
     return null;
@@ -33,5 +38,13 @@ public class RingNode {
 
   public Node getDownStream() {
     return null;
+  }
+
+  public int getMainTaskId() {
+    return mainTaskId;
+  }
+
+  public void setMainTaskId(int mainTaskId) {
+    this.mainTaskId = mainTaskId;
   }
 }
