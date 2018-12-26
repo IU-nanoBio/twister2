@@ -56,9 +56,22 @@ public class FixedRing {
       }
       Node node = new Node(mainTaskId, group);
       node.addDirectChildren(tasks);
+
+      ring.put(executor, node);
     }
 
     //Now to connect the ring
+    iter = plan.getAllExecutors().iterator();
+    int ringSize = plan.getAllExecutors().size();
+    while (iter.hasNext()) {
+      int executor = iter.next();
+      int child =  (executor == 0) ? ringSize - 1 : executor - 1;
+      int parent = (executor + 1) % ringSize;
+      ring.get(executor).setParent(ring.get(parent));
+      ring.get(executor).addChild(ring.get(child));
+
+    }
+
   }
 
   public Node get(int t) {

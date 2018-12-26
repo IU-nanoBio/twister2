@@ -71,44 +71,44 @@ public class RingRouter {
 
     // now lets construct the receive tasks tasks
     receiveExecutors = new HashSet<>();
-    for (int t : thisExecutorTasksOfOperation) {
-      List<Integer> recv = new ArrayList<>();
 
-      Node node = fixedRing.get(t);
-      if (node != null) {
-        mainTask = node.getTaskId();
-        LOG.fine(String.format("%d main task: %d", plan.getThisExecutor(), mainTask));
-        // this is the only task that receives messages
-        for (int k : node.getRemoteChildrenIds()) {
-          receiveExecutors.add(plan.getExecutorForChannel(k));
-        }
-        recv.addAll(node.getAllChildrenIds());
-        receiveTasks.put(t, new ArrayList<>(recv));
+    List<Integer> recv = new ArrayList<>();
+    int executor = plan.getThisExecutor();
+    Node node = fixedRing.get(executor);
+    if (node != null) {
+      mainTask = node.getTaskId();
+      LOG.fine(String.format("%d main task: %d", plan.getThisExecutor(), mainTask));
+      // this is the only task that receives messages
+      for (int k : node.getRemoteChildrenIds()) {
+        receiveExecutors.add(plan.getExecutorForChannel(k));
+      }
+      recv.addAll(node.getAllChildrenIds());
+      receiveTasks.put(node.getTaskId(), new ArrayList<>(recv));
 
-        // this task is connected to others and they send the message to this task
-        List<Integer> directChildren = node.getDirectChildren();
-        for (int child : directChildren) {
-          Set<Integer> sendTasks = new HashSet<>();
-          sendTasks.add(t);
-          sendInternalTasks.put(child, sendTasks);
-          destinationIdentifiers.put(child, t);
-        }
-
-
-        // now lets calculate the external send tasks of the main task
-        Node downStream = node.getParent();
-        if (downStream == null) {
-          throw new IllegalStateException("Downstream node cannot be null, ring communication "
-              + "should always have a downstream element");
-        }
-        if (downStream != null) {
-          Set<Integer> sendTasks = new HashSet<>();
-          sendTasks.add(downStream.getTaskId());
-          sendExternalTasksPartial.put(t, sendTasks);
-          destinationIdentifiers.put(t, downStream.getTaskId());
-        }
+      // this task is connected to others and they send the message to this task
+      List<Integer> directChildren = node.getDirectChildren();
+      for (int child : directChildren) {
+        Set<Integer> sendTasks = new HashSet<>();
+        sendTasks.add(node.getTaskId());
+        sendInternalTasks.put(child, sendTasks);
+        destinationIdentifiers.put(child, node.getTaskId());
       }
 
+
+      // now lets calculate the external send tasks of the main task
+      Node downStream = node.getParent();
+      if (downStream == null) {
+        throw new IllegalStateException("Downstream node cannot be null, ring communication "
+            + "should always have a downstream element");
+      }
+      if (downStream != null) {
+        Set<Integer> sendTasks = new HashSet<>();
+        sendTasks.add(downStream.getTaskId());
+        sendExternalTasksPartial.put(node.getTaskId(), sendTasks);
+        destinationIdentifiers.put(node.getTaskId(), downStream.getTaskId());
+      }
     }
+
+
   }
 }
