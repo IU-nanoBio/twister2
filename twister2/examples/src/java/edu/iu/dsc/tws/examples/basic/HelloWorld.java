@@ -82,8 +82,11 @@ public class HelloWorld implements IWorker {
     JobConfig jobConfig = new JobConfig();
     jobConfig.put("hello-key", "Twister2-Hello");
 
+    int random = (int) (Math.random() * 10000);
+    String jobName = "hello-world-job-" + random;
+
     Twister2Job twister2Job = Twister2Job.newBuilder()
-        .setJobName("hello-world-job")
+        .setJobName(jobName)
         .setWorkerClass(HelloWorld.class)
         .addComputeResource(2, 1024, numberOfWorkers)
         .setConfig(jobConfig)

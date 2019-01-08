@@ -107,8 +107,11 @@ public class KMeansJobMain {
     JobConfig jobConfig = new JobConfig();
     jobConfig.putAll(configurations);
 
+    int random = (int) (Math.random() * 10000);
+    String jobName = "kmeans-job-" + random;
+
     Twister2Job.Twister2JobBuilder jobBuilder = Twister2Job.newBuilder();
-    jobBuilder.setJobName("KMeans-job");
+    jobBuilder.setJobName(jobName);
     jobBuilder.setWorkerClass(KMeansJob.class.getName());
     jobBuilder.addComputeResource(2, 512, 1.0, workers);
     jobBuilder.setConfig(jobConfig);

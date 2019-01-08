@@ -118,10 +118,13 @@ public class WordCountJob extends TaskWorker {
     // first load the configurations from command line and config files
     Config config = ResourceAllocator.loadConfig(new HashMap<>());
 
+    int random = (int) (Math.random() * 10000);
+    String jobName = "streaming-wordcount-" + random;
+
     // build JobConfig
     JobConfig jobConfig = new JobConfig();
     Twister2Job.Twister2JobBuilder jobBuilder = Twister2Job.newBuilder();
-    jobBuilder.setJobName("wordcount-streaming-task");
+    jobBuilder.setJobName(jobName);
     jobBuilder.setWorkerClass(WordCountJob.class);
     jobBuilder.addComputeResource(1, 512, 4);
     jobBuilder.setConfig(jobConfig);
