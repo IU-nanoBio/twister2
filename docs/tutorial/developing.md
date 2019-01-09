@@ -66,11 +66,11 @@ To run hello world example;
 ```
 To run batch word count example
 ```bash
-  ./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.batch.wordcount.WordCountJob
+  ./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.batch.wordcount.task.WordCountJob
 ```
 To run streaming word count example
 ```bash
-./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.streaming.wordcount.WordCountJob
+./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.streaming.wordcount.task.WordCountJob
 ```
 
 ## Echo Cluster
@@ -91,7 +91,7 @@ Twister2 is installed under twister2 directory.
 Go to the directory:
 
 ```bash
-cd twister2/bazel-bin/scripts/package/twister2-0.1.0/
+cd twister2-0.1.0
 ```
 
 Then, to run an example you can use the ```twister2 submit``` command.
@@ -224,7 +224,7 @@ It uses communication layer and resource scheduling layer
 
 The example code can be found in
 ```bash
-twister2/examples/src/java/edu/iu/dsc/tws/examples/batch/wordcount/
+twister2/examples/src/java/edu/iu/dsc/tws/examples/batch/wordcount/task/
 ```
 
 In order to run the example go to the following directory
@@ -270,7 +270,7 @@ It uses communication layer and resource scheduling layer
 The example code can be found in
 
 ```bash
-twister2/examples/src/java/edu/iu/dsc/tws/examples/streaming/wordcount/
+twister2/examples/src/java/edu/iu/dsc/tws/examples/streaming.wordcount/task/
 ```
 
 In order to run the example go to the following directory
