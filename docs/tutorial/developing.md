@@ -24,11 +24,43 @@ Execute the two commands to pull the docker image and launch a container instanc
 sudo docker pull twister2tutorial/twister2:standalone
 
 sudo docker run -it twister2tutorial/twister2:standalone bash
+```
+
+![Content of Docker](pics/docker_image.png)
+
+Docker image has Twister2 installed and you can run examples.
+
+You should go into twister2-0.1.0 directory first.
+
+```bash
+cd twister2-0.1.0/
 
 ls
 ```
 
-Docker image has Twister2 installed and you can run examples.
+![Twister2 Directory](pics/twister2_ls.png)
+
+Then, to run an example you can use the ```twister2 submit``` command with ```standlone``` as the cluster.
+
+For example;
+
+To run hello world example;
+
+```bash
+  ./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.basic.HelloWorld
+```
+To run batch word count example
+```bash
+  ./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.batch.wordcount.task.WordCountJob
+```
+To run streaming word count example
+```bash
+./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.streaming.wordcount.task.WordCountJob
+```
+To run K-means example
+```bash
+./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.batch.kmeans.KMeansJobMain -workers 4 -iter 2 -dim 2 -clusters 4 -fname /tmp/output.txt -pointsfile /tmp/kinput.txt -centersfile /tmp/kcentroid.txt -points 100 -filesys local -pseedvalue 100 -cseedvalue 500 -input generate -parallelism 4
+```
 
 Here are some useful docker commands
 
@@ -51,26 +83,6 @@ and log into the docker
 
 ```bash
 sudo docker exec -it <container_id> bash
-```
-
-You should go into twister2 directory first.
-
-Then, to run an example you can use the ```twister2 submit``` command with ```standlone``` as the cluster.
-
-For example;
-
-To run hello world example;
-
-```bash
-  ./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.basic.HelloWorld
-```
-To run batch word count example
-```bash
-  ./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.batch.wordcount.task.WordCountJob
-```
-To run streaming word count example
-```bash
-./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.streaming.wordcount.task.WordCountJob
 ```
 
 ## Echo Cluster
@@ -96,14 +108,23 @@ cd twister2-0.1.0
 
 Then, to run an example you can use the ```twister2 submit``` command.
 
+You can check the status of the submitted job through the dashboard provided by the resource scheduler.  For our Echo Cluster the address is;
+
+```text
+Kubernetes ---> http://149.165.150.81:8080/#/jobs
+```
+
+
+
 ## Examples
 
-We have four examples
+We have five examples for you.
 
 * [Hello world example](developing.md#hello-world-example)
 * [Batch wordcount example](developing.md#batch-wordcount-example)
 * [Streaming wordcount example](developing.md#streaming-wordcount-example)
 * [Machine learning example K-Means](developing.md#machine-learning-example-kmeans)
+* [Joins example](developing.md#joins-example)
 
 
 ## Hello World Example
@@ -130,13 +151,24 @@ You can submit HelloWorld job in examples package with 8 workers as;
 If you are using our testbed cluster “Echo”,
 
 1. Login to your account in Echo
-2. Change you directory to  ```twister2/twister2/bazel-bin/scripts/package/twister2-0.1.0/```
+2. Change you directory to  ```twister2-0.1.0```
 3. Run the command above.
 
-You can check the status of the submitted job through the dashboard provided by the resource scheduler.  For our Echo Cluster the address is;
+You can check the status of the submitted job on Kubernetes through the dashboard provided by the resource scheduler.  For our Echo Cluster the address is;
 
 ```text
 Kubernetes ---> http://149.165.150.81:8080/#/jobs
+```
+
+If you want to see the logs on Kubernetes, you need to get the list of the pods first;
+
+```bash
+kubectl get pods
+```
+Then check the logs with the following command
+
+```bash
+kubectl logs -f <pod-name>
 ```
 
 HelloWorld job runs for 1 minute. After 1 minute, the job becomes COMPLETED if everything is fine.
@@ -229,7 +261,7 @@ twister2/examples/src/java/edu/iu/dsc/tws/examples/batch/wordcount/task/
 
 In order to run the example go to the following directory
 ```bash
-cd bazel-bin/scripts/package/twister2-dist/
+cd twister2-0.1.0
 ```
 
 And run the command below  using standalone resource scheduler
@@ -249,6 +281,23 @@ It will run 4 executors with 8 tasks
 * Each executor will have two tasks
 * At the first phase tasks 0-3 running on each executor will generate words
 * After the words are generated, task 5-8 will consume those words and count.
+
+You can check the status of the submitted job on Kubernetes through the dashboard provided by the resource scheduler.  For our Echo Cluster the address is;
+
+```text
+Kubernetes ---> http://149.165.150.81:8080/#/jobs
+```
+
+If you want to see the logs on Kubernetes, you need to get the list of the pods first;
+
+```bash
+kubectl get pods
+```
+Then check the logs with the following command
+
+```bash
+kubectl logs -f <pod-name>
+```
 
 
 You can access to the presentation using the link below
@@ -276,7 +325,7 @@ twister2/examples/src/java/edu/iu/dsc/tws/examples/streaming.wordcount/task/
 In order to run the example go to the following directory
 
 ```bash
-cd bazel-bin/scripts/package/twister2-dist/
+cd twister2-0.1.0
 ```
 
 And run the command below  using standalone resource scheduler
@@ -299,14 +348,35 @@ It will run 4 executors with 8 tasks
 * The tasks in the first two executors will generate words
 * The tasks in the last two executors will keep word count.
 
-After running the example, you will see the following output
+After running the example, you will see an output like the following;
 
 ```bash
-edu.iu.dsc.tws.examples.streaming.wordcount.WordAggregate addValue
-INFO: 2 Received words: 2000 map: {=267, oO=52, 8LV=46, gK=47, uZ=52, F=56, H=55, 6y0=48, N=36, whB=53, DIu=52, FX=49, R=50, Ja=45, lC=45, b=49, c=46, d=43, sGJ3=63, h=44, uF=56, oB=41, t=54, 7m4M=40, w=141, 7=48, msSX=52, yR=48, 7UvX=50, 3hHU=49, RN=58, 1N=57, nSA=53, ZR6=55}
+[2019-01-09 09:50:52 +0000] [INFO] edu.iu.dsc.tws.examples.streaming.wordcount.task.WordCountJob: 2 Word wA count 1
+[2019-01-09 09:50:52 +0000] [INFO] edu.iu.dsc.tws.examples.streaming.wordcount.task.WordCountJob: 0 Word 4 count 1
+[2019-01-09 09:50:52 +0000] [INFO] edu.iu.dsc.tws.examples.streaming.wordcount.task.WordCountJob: 2 Word lJx count 1
+[2019-01-09 09:50:52 +0000] [INFO] edu.iu.dsc.tws.examples.streaming.wordcount.task.WordCountJob: 0 Word gxsn count 1
 ```
 
 At this point you should manually stop the process (CTRL+C)
+
+
+You can check the status of the submitted job on Kubernetes through the dashboard provided by the resource scheduler.  For our Echo Cluster the address is;
+
+```text
+Kubernetes ---> http://149.165.150.81:8080/#/jobs
+```
+
+If you want to see the logs on Kubernetes, you need to get the list of the pods first;
+
+```bash
+kubectl get pods
+```
+Then check the logs with the following command
+
+```bash
+kubectl logs -f <pod-name>
+```
+
 
 You can access to the presentation using the link below
 
@@ -334,7 +404,7 @@ This command generate and write the datapoints and centroids in the local filesy
 #### Kubernetes
 
 ```bash
-./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.batch.kmeans.KMeansJobMain -workers 4 -iter 2 -dim 2 -clusters 4 -fname /tmp/output.txt -pointsfile /tmp/kinput.txt -centersfile /tmp/kcentroid.txt -points 100 -filesys local -pseedvalue 100 -cseedvalue 500 -input generate -parallelism 4
+./bin/twister2 submit kubernetes jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.batch.kmeans.KMeansJobMain -workers 4 -iter 2 -dim 2 -clusters 4 -fname /tmp/output.txt -pointsfile /tmp/kinput.txt -centersfile /tmp/kcentroid.txt -points 100 -filesys local -pseedvalue 100 -cseedvalue 500 -input generate -parallelism 4
 
 ```
 
@@ -350,6 +420,24 @@ This command generate and write the datapoints and centroids in the HDFS and run
 
 ```bash
 ./bin/twister2 submit kubernetes jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.batch.kmeans.KMeansJobMain -workers 4 -iter 2 -dim 2 -clusters 4 -fname /tmp/output.txt -pointsfile /tmp/kinput.txt -centersfile /tmp/kcentroid.txt -points 100 -filesys hdfs -pseedvalue 100 -cseedvalue 200 -input generate -parallelism 4
+```
+
+
+You can check the status of the submitted job on Kubernetes through the dashboard provided by the resource scheduler.  For our Echo Cluster the address is;
+
+```text
+Kubernetes ---> http://149.165.150.81:8080/#/jobs
+```
+
+If you want to see the logs on Kubernetes, you need to get the list of the pods first;
+
+```bash
+kubectl get pods
+```
+Then check the logs with the following command
+
+```bash
+kubectl logs -f <pod-name>
 ```
 
 ### Implementation Details
@@ -499,6 +587,75 @@ You can access to the presentation using the link below
 [K-Means example](https://docs.google.com/presentation/d/1-AZXo3KjPEk7E-k7_Z5lSKdPk_9R4D8w9PgNrijQeUU/edit#slide=id.p)
 
 
+## Joins Example
+
+Joins are a important operation that is windley used in big data applications. Since joins can be
+very expensive operation it is important to have a efficient join operation. Twister2 supports join operations through its optimized communication layer. 
+
+The following join example showcases how a join operation can be performed using the Twister2 communication API. Since this example is presented at the communication level the complexity of the code is a little high. Since the code needs to handle other aspects such as task management and execution within the example code. Using joins at the task layer and data layer will gradually reduce this complexity because each layer hides complexities from the end user. However it is usefull to understand operations at the communication layer since it gives you the 
+most freedom to optimize according to your needs. 
+
+## Data
+
+The data set used for this example is pretty simple and straightforward. The example joins two data sets, the first one has a set of student id's and the corresponding first names for each student id. And the second data set has student id's and the corresponding courses that students have taken. 
+
+#### Data Set 1
+| Student Id | First Name |
+|:----------:|:----------:|
+|      1     |    John    |
+|      2     |    Matt    |
+|      3     |    Kara    |
+
+#### Data Set 2
+
+| Student Id | Course Id  |
+|:----------:|:----------:|
+|      1     |    E101    |
+|      2     |    E351    |
+|      3     |    E403    |
+|      1     |    E403    |
+
+#### Resulting Data set
+
+| Student Id | First Name |  Course Id |
+|:----------:|:----------:|:----------:|
+|      1     |    John    | E101, E403 |
+|      2     |    Matt    |    E351    |
+|      3     |    Kara    |    E403    |
 
 
+## Running join example
+
+The join example is added in the Twister2 code as a communication example. The code has comments explaining each step of the example to explain what each section of the code does. You can use the following command to execute the join example. 
+
+Full Code example - [Student Join Example](https://github.com/DSC-SPIDAL/twister2/blob/master/twister2/examples/src/java/edu/iu/dsc/tws/examples/comms/batch/BJoinStudentExample.java)
+
+### Standalone
+
+```bash
+./bin/twister2 submit standalone jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.comms.ExampleMain -workers 8 -op "joinstudent" -stages 8,1 2>&1 | tee out.txt
+```
+
+### Kubernetes
+
+```bash
+./bin/twister2 submit kubernetes jar examples/libexamples-java.jar edu.iu.dsc.tws.examples.comms.ExampleMain -workers 8 -op "joinstudent" -stages 8,1 2>&1 | tee out.txt
+```
+
+As a result at the end of the run the following will be printed which show the joined results. Please note that the results generated are based on the values in the example, which are different from the simple example provided above.
+
+```bash
+Key 1 : Value [John, E342, E247, E333]  
+Key 2 : Value [Peter, E542]  
+Key 3 : Value [Tedd, E242, E101]  
+Key 4 : Value [Jake, E342]  
+Key 5 : Value [Matt, E347, E541]  
+Key 6 : Value [Adam, E347]  
+Key 7 : Value [Max, E101]  
+Key 8 : Value [Roger, E241]  
+```
+
+## How it works underneath.
+
+The join is implemented using two keyed partition operations, The framework shuffles the data to sink tasks based on the key values such that data entries with the same key values are collected at a single sink task. Then the appropriate join operation is executed based on the keys and values in both data sets and the combined results are sent back to the user.
 
