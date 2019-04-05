@@ -68,6 +68,7 @@ public class KMeansTsetJob extends TSetBatchWorker implements Serializable {
     long endTimeData = System.currentTimeMillis();
 
     for (int i = 0; i < iterations; i++) {
+      long start = System.nanoTime();
       IterableMapTSet<double[][], double[][]> kmeansTSet = points.map(new KMeansMap());
       kmeansTSet.addInput("centers", centers);
       AllReduceTLink<double[][]> reduced = kmeansTSet.allReduce((t1, t2) -> {
@@ -82,6 +83,8 @@ public class KMeansTsetJob extends TSetBatchWorker implements Serializable {
         return newCentroids;
       });
       centers = reduced.map(new AverageCenters(), parallelismValue).cache();
+      LOG.log(Level.INFO, String.format("KMEANS ITR compute %d - %d",
+          i, System.nanoTime() - start));
     }
 
     long endTime = System.currentTimeMillis();
@@ -106,13 +109,14 @@ public class KMeansTsetJob extends TSetBatchWorker implements Serializable {
 
     @Override
     public double[][] map(Iterable<double[][]> t) {
-
+      long start = System.nanoTime();
       double[][] data = t.iterator().next();
       //TODO: cast needed since the context inputmap can hold many types of TSets, Solution?
       double[][] centers = (double[][]) context.getInput("centers").
           getPartitionData(context.getIndex());
       KMeansCalculator kMeansCalculator = new KMeansCalculator(data, centers, dimension);
       double[][] kMeansCenters = kMeansCalculator.calculate();
+      LOG.log(Level.INFO, String.format("KMEANS compute %d", System.nanoTime() - start));
       return kMeansCenters;
     }
   }

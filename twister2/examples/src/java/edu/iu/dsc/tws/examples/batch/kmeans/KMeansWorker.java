@@ -44,6 +44,7 @@ import edu.iu.dsc.tws.task.graph.OperationMode;
  */
 public class KMeansWorker extends TaskWorker {
   private static final Logger LOG = Logger.getLogger(KMeansWorker.class.getName());
+  private static long commStart;
 
   /**
    * First, the execute method invokes the generateDataPoints method to generate the datapoints file
@@ -162,7 +163,10 @@ public class KMeansWorker extends TaskWorker {
 
     //Perform the iterations from 0 to 'n' number of iterations
     for (int i = 0; i < iterations; i++) {
+      long start = System.nanoTime();
       ExecutionPlan plan = taskExecutor.plan(kmeansTaskGraph);
+      long planTime = System.nanoTime();
+      LOG.log(Level.INFO, String.format("Plan time %d - %d", i, System.nanoTime() - start));
       //add the datapoints and centroids as input to the kmeanssource task.
       taskExecutor.addInput(
           kmeansTaskGraph, plan, "kmeanssource", "points", dataPointsObject);
@@ -172,6 +176,9 @@ public class KMeansWorker extends TaskWorker {
       taskExecutor.execute(kmeansTaskGraph, plan);
       //retrieve the new centroid value for the next iterations
       centroidsDataObject = taskExecutor.getOutput(kmeansTaskGraph, plan, "kmeanssink");
+      LOG.log(Level.INFO, String.format("Compute time %d - %d, %d, %d", i,
+          (System.nanoTime() - start) / 1000000, (planTime - start) / 1000000,
+          System.currentTimeMillis() - commStart));
     }
 
     DataPartition<?> centroidPartition = centroidsDataObject.getPartitions(workerId);
@@ -198,6 +205,7 @@ public class KMeansWorker extends TaskWorker {
 
     @Override
     public void execute() {
+      long start = System.nanoTime();
       int dim = Integer.parseInt(config.getStringValue("dim"));
 
       DataPartition<?> dataPartition = dataPointsObject.getPartitions(context.taskIndex());
@@ -208,7 +216,9 @@ public class KMeansWorker extends TaskWorker {
 
       kMeansCalculator = new KMeansCalculator(datapoints, centroid, dim);
       double[][] kMeansCenters = kMeansCalculator.calculate();
+      commStart = System.currentTimeMillis();
       context.writeEnd("all-reduce", kMeansCenters);
+      LOG.log(Level.INFO, String.format("kmeans time %d", (System.nanoTime() - start) / 1000000));
     }
 
     @SuppressWarnings("unchecked")
